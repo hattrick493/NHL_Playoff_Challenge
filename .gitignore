@@ -1,0 +1,5 @@
+# Ignore Mac system files
+.DS_store
+
+# Ignore Google Sheets API Client Key
+client_key.json
