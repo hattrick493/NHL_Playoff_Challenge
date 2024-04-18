@@ -1,7 +1,34 @@
 import requests
-# You need to install the requests module to use this code
 import json
 from datetime import date
+# Import Google Sheets API modules
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import pprint
+
+
+# Authorize the API by creating the ServiceAccountCredentials and
+# passing the JSON file client_key.json
+# Using ‘gspread’ we will authorize the API.
+
+scope = [
+    'https://www.googleapis.com/auth/drive',
+    'https://www.googleapis.com/auth/drive.file'
+    ]
+file_name = 'client_key.json'
+creds = ServiceAccountCredentials.from_json_keyfile_name(file_name, scope)
+client = gspread.authorize(creds)
+
+# Fetch the sheet
+sheet = client.open('NHL 2024 POOL').sheet1
+python_sheet = sheet.get_all_records()
+goals = sheet.get("Q1:y17") # fetches all values from a range of cells.
+pp = pprint.PrettyPrinter()
+#pp.pprint(python_sheet)
+
+pp.pprint(goals)
+# get_all_records() fetches the entire sheet in JSON format.
+# pprint() provided by PrettyPrinter() beautifies the JSON response.
 
 now = str(date.today())
 # serviceurl = 'https://api-web.nhle.com/v1/schedule/now'
@@ -9,8 +36,6 @@ serviceurl = "https://api-web.nhle.com/v1/score/now"
 
 r = requests.get(serviceurl)
 data = r.text
-print('Retrieved', len(data), 'characters')
-
 
 try:
     js = json.loads(data)
@@ -18,28 +43,26 @@ except:
     js = None
 
 game_list = []
-
 games_week = js['gameWeek']
 data = js['games']
-print(json.dumps(games_week, indent=4))
-print(json.dumps(data, indent=4))
+
+#print(json.dumps(games_week, indent=4))
+#print(json.dumps(data, indent=4))
+
+# Step through the JSON data and get create key-value pairs
 for game in data:
     game_dict = {}
-    hometeam = game['homeTeam']['abbrev']
-    awayteam = game['awayTeam']['abbrev']
-    game_dict['hometeam'] = hometeam
-    game_dict['awayteam'] = awayteam
+    game_dict['hometeam'] = game['homeTeam']['abbrev']
+    game_dict['awayteam'] = game['awayTeam']['abbrev']
     if game['gameState'] == 'LIVE' or game['gameState'] == 'OFF':
-        homescore = game['homeTeam']['score']
-        awayscore = game['awayTeam']['score']
-        game_dict['homescore'] = homescore
-        game_dict['awayscore'] = awayscore
+        game_dict['homescore'] = game['homeTeam']['score']
+        game_dict['awayscore'] = game['awayTeam']['score']
+        game_dict['period'] = game["period"]
+        game_dict['clock'] = game["clock"]["timeRemaining"]
+        game_dict['intermission'] = game["clock"]["inIntermission"]
     game_list.append(game_dict)
-    # if game['gameState'] == 'LIVE':
-        # print(hometeam, 'VS', awayteam)
-        # print('', homescore, '   ', awayscore)
 
-print(json.dumps(game_list, indent=4))
+#print(json.dumps(game_list, indent=4))
 
 # print(type(js['gameWeek']))
 # for day in js['gameWeek']:
