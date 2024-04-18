@@ -3,3 +3,6 @@
 
 # Ignore Google Sheets API Client Key
 client_key.json
+
+# Ignore Virtual Environment Folder
+/nhl
