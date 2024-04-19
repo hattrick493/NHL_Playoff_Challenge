@@ -22,10 +22,10 @@ matchupsRD1 = [["FLA", "TBL"],
                ["BOS", "TOR"],
                ["NYR", "WSH"],
                ["CAR", "NYI"],
-               ["DAL", "LAK"],
+               ["DAL", "VGK"],
                ["WPG", "COL"],
                ["VAN", "NSH"],
-               ["EDM", "VGK"]]
+               ["EDM", "LAK"]]
 
 # Fetch the sheet
 sheet = client.open('NHL 2024 POOL').sheet1
