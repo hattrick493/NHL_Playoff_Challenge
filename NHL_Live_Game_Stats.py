@@ -36,6 +36,9 @@ matchupsRD1 = [["FLA", "TBL"],
                ["VAN", "NSH"],
                ["EDM", "LAK"]]
 
+teamsRD1 = ["FLA", "TBL", "BOS", "TOR", "NYR", "WSH", "CAR", "NYI", "DAL"
+            "VGK", "WPG", "COL", "VAN", "NSH", "EDM", "LAK"]
+
 # serviceurl = 'https://api-web.nhle.com/v1/schedule/now'
 serviceurl = "https://api-web.nhle.com/v1/score/now"
 # serviceurl = "https://api-web.nhle.com/v1/score/2024-04-20"
@@ -52,12 +55,26 @@ while True:
 
     prevSeriesGoals = seriesGoals
     seriesGoals = sheet.get(goalsLoc)  # fetches values from a range of cells
+    # Loop through the seriesGoals snd change scores from string to 
+    # int. skip first row (header row) and skip first column (team 
+    # name)
+    for series in seriesGoals[1:]:
+        for idx, goals in enumerate(series[1:]):
+            if isinstance(goals, str):
+                if goals == " ":
+                    continue
+                else:
+                    newGoal = int(goals)
+                    series[idx+1] = newGoal
     prevWins = wins
     wins = sheet.get(winsLoc)  # fetches values from a range of cells.
 
     pp = pprint.PrettyPrinter()
+    pp.pprint(prevSeriesGoals)
+    print("")
     pp.pprint(seriesGoals)
-    pp.pprint(wins)
+    # pp.pprint(seriesGoals)
+    # pp.pprint(wins)
 
     now = str(date.today())
 
@@ -137,6 +154,18 @@ while True:
     if seriesGoals == prevSeriesGoals:
         print(currentTime, "Score data is unchanged.\nDon't update the spreadsheet")
     else:
+        # Loop through the seriesGoals snd change scores from string to 
+        # int. skip first row (header row) and skip first column (team 
+        # name)
+        for series in seriesGoals[1:]:
+            for idx, goals in enumerate(series[1:]):
+                if isinstance(goals, str):
+                    if goals == " ":
+                        continue
+                    else:
+                        newGoal = int(goals)
+                        series[idx+1] = newGoal
+
         sheet.update(seriesGoals, goalsLoc)
         print("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
         print(currentTime, "New Score Data")
