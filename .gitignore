@@ -6,3 +6,5 @@ client_key.json
 
 # Ignore Virtual Environment Folder
 /nhl
+
+ErrorMessage.txt
