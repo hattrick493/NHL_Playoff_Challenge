@@ -26,36 +26,49 @@ client = gspread.authorize(creds)
 gameList = []
 seriesGoals = []
 wins = []
-
-matchupsRD1 = [["FLA", "TBL"],
-               ["BOS", "TOR"],
-               ["NYR", "WSH"],
-               ["CAR", "NYI"],
-               ["DAL", "VGK"],
-               ["WPG", "COL"],
-               ["VAN", "NSH"],
-               ["EDM", "LAK"]]
-
-teamsRD1 = ["FLA", "TBL", "BOS", "TOR", "NYR", "WSH", "CAR", "NYI", "DAL"
-            "VGK", "WPG", "COL", "VAN", "NSH", "EDM", "LAK"]
-
+# set this at the beginning of each round
+playoffRound = 2
 # serviceurl = 'https://api-web.nhle.com/v1/schedule/now'
 serviceurl = "https://api-web.nhle.com/v1/score/now"
-# serviceurl = "https://api-web.nhle.com/v1/score/2024-04-20"
 
-goalsLoc = "S1:Z17"
-winsLoc = "B48:I55"
+goalsLocRD1 = "S1:Z17"
+winsLocRD1 = "B48:I55"
+
+goalsLocRD2 = "S1:Z9"
+winsLocRD2 = "B28:I31"
+
+goalsLocRD3 = "S1:Z5"
+winsLocRD3 = "B18:I19"
+
+goalsLocSCF = "S1:Z3"
+winsLocSCF = "B18:I18"
+
 
 while True:
     # Fetch the sheet
     # get_all_records() fetches the entire sheet in JSON format.
     # pprint() provided by PrettyPrinter() beautifies the JSON response.
-    sheet = client.open('NHL 2024 POOL').sheet1
-    python_sheet = sheet.get_all_records()
+
+    if playoffRound == 1:
+        goalsLoc = goalsLocRD1
+        winsLoc = winsLocRD1
+        sheet = client.open('NHL 2024 POOL').worksheet("RD1")
+    elif playoffRound == 2:
+        goalsLoc = goalsLocRD2
+        winsLoc = winsLocRD2
+        sheet = client.open('NHL 2024 POOL').worksheet("RD2")
+    elif playoffRound == 3:
+        goalsLoc = goalsLocRD3
+        winsLoc = winsLocRD3
+        sheet = client.open('NHL 2024 POOL').worksheet("RD3")
+    elif playoffRound == 4:
+        goalsLoc = goalsLocSCF
+        winsLoc = winsLocSCF
+        sheet = client.open('NHL 2024 POOL').worksheet("SCF")
 
     prevSeriesGoals = seriesGoals
     seriesGoals = sheet.get(goalsLoc)  # fetches values from a range of cells
-    # Loop through the seriesGoals snd change scores from string to 
+    # Loop through the seriesGoals and change scores from string to 
     # int. skip first row (header row) and skip first column (team 
     # name)
     for series in seriesGoals[1:]:
@@ -70,11 +83,10 @@ while True:
     wins = sheet.get(winsLoc)  # fetches values from a range of cells.
 
     pp = pprint.PrettyPrinter()
-    pp.pprint(prevSeriesGoals)
+    # pp.pprint(prevSeriesGoals)
     print("")
     pp.pprint(seriesGoals)
-    # pp.pprint(seriesGoals)
-    # pp.pprint(wins)
+    pp.pprint(wins)
 
     now = str(date.today())
 
@@ -174,7 +186,7 @@ while True:
 
     for game in gameList:
         keepGoing = False
-        if game['gameState'] == 'FINAL':
+        if game['gameState'] == 'FINAL' or game['gameState'] == 'OFF':
             continue
         else:
             keepGoing = True
